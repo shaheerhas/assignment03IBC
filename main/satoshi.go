@@ -1,12 +1,11 @@
 package main
 
-
 import (
+	a3 "assignment03IBC"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
-	a3 "assignment03IBC"
 )
 
 func main() {
@@ -14,13 +13,13 @@ func main() {
 	satoshiAddress := os.Args[1]
 	//should have used a setter and made the variable private
 	a3.Quorum, _ = strconv.Atoi(os.Args[2])
-	fmt.Println("server running, Qourum: ",a3.Quorum)
+	fmt.Println("server running, Qourum: ", a3.Quorum)
 	//The function below launches and initializes the chain and the server
 	//It then starts a routine for each connection request received
 	//The listening address of each node and their conn info is then stored
 	//it is important not to sequentually do things in StartListening routine and
 	//rather use channel for communication between routines
-	go a3.StartListening(satoshiAddress, "Satoshi")
+	go a3.StartListening(satoshiAddress, "satoshi")
 
 	//this should block satoshi till the quorum is complete
 	//Hint: we can read from a channel to block a routine unless some other writes
@@ -36,4 +35,5 @@ func main() {
 	//infinite for loop is not recommended
 	select {}
 }
+
 //

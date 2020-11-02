@@ -11,15 +11,16 @@ import (
 
 type node struct {
 	connection net.Conn
-	address string
+	address    string
 }
+
 var Quorum int
-var connections[] node
+var connections []node
 var ChainHead *a2.Block
 
-func StartListening( myListeningAddress string,  listener string){
-	if listener == "Satoshi" {
-		ChainHead = a2.InsertBlock("","",listener,0,ChainHead)
+func StartListening(myListeningAddress string, listener string) {
+	if listener == "satoshi" {
+		ChainHead = a2.InsertBlock("", "", "Satoshi", 0, ChainHead)
 
 		ln, err := net.Listen("tcp", myListeningAddress)
 		if err != nil {
@@ -38,36 +39,36 @@ func StartListening( myListeningAddress string,  listener string){
 			}
 			go handleConnection(conn, listener)
 		}
-	}else{
+	} else {
 
 		ln, err := net.Listen("tcp", myListeningAddress)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-			conn, err := ln.Accept()
-			if err != nil {
-				log.Println(err)
-			}
+		conn, err := ln.Accept()
+		if err != nil {
+			log.Println(err)
+		}
 
 		fmt.Println(ReadString(conn))
 
 	}
 
 }
-func handleConnection(conn net.Conn,listener string){
+func handleConnection(conn net.Conn, listener string) {
 	Quorum--
-	i:=0
-	for i < len(connections){
+	i := 0
+	for i < len(connections) {
 		if connections[i].connection == conn {
 			connections[i].address = ReadString(conn)
 			break
 		}
 	}
-	ChainHead = a2.InsertBlock("","",listener,0,ChainHead)
+	ChainHead = a2.InsertBlock("", "", listener, 0, ChainHead)
 }
-func WriteString(conn net.Conn, myListeningAddress string){
-	conn.Write([]byte(myListeningAddress+"\n"))
+func WriteString(conn net.Conn, myListeningAddress string) {
+	conn.Write([]byte(myListeningAddress + "\n"))
 }
 func ReadString(conn net.Conn) string {
 
@@ -75,7 +76,7 @@ func ReadString(conn net.Conn) string {
 	str, _, _ := clientReader.ReadLine()
 	return string(str)
 }
-func ReceiveChain(conn net.Conn) a2.Block{
+func ReceiveChain(conn net.Conn) a2.Block {
 
 	var recvdBlock a2.Block
 	dec := gob.NewDecoder(conn)
@@ -86,12 +87,12 @@ func ReceiveChain(conn net.Conn) a2.Block{
 	}
 	return recvdBlock
 }
-func WaitForQuorum(){
-	for Quorum > 0{
+func WaitForQuorum() {
+	for Quorum > 0 {
 	}
 }
-func SendChainandConnInfo(){
-	i:=0
+func SendChainandConnInfo() {
+	i := 0
 	for i < len(connections) {
 		gobEncoder := gob.NewEncoder(connections[i].connection)
 		err := gobEncoder.Encode(ChainHead)
@@ -99,10 +100,10 @@ func SendChainandConnInfo(){
 			log.Println(err)
 		}
 
-		if i==0{
-			WriteString(connections[i].connection,connections[len(connections)-1].address)
-		}else {
-			WriteString(connections[i].connection,connections[i-1].address)
+		if i == 0 {
+			WriteString(connections[i].connection, connections[len(connections)-1].address)
+		} else {
+			WriteString(connections[i].connection, connections[i-1].address)
 		}
 		i++
 	}
